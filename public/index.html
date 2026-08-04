@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rudra — Video & Audio Calls</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+
+    <main class="app">
+      <section id="lobby" class="lobby">
+        <header class="brand">
+          <p class="brand-mark">Rudra</p>
+          <h1>Clear calls. Zero setup.</h1>
+          <p class="lede">
+            Start a private 1:1 video or audio room. Share the code and connect
+            peer-to-peer.
+          </p>
+        </header>
+
+        <form id="join-form" class="join-form" autocomplete="off">
+          <label>
+            <span>Your name</span>
+            <input
+              id="display-name"
+              name="name"
+              type="text"
+              maxlength="40"
+              placeholder="Alex"
+              required
+            />
+          </label>
+          <label>
+            <span>Room code</span>
+            <input
+              id="room-id"
+              name="room"
+              type="text"
+              maxlength="32"
+              placeholder="SUNRISE"
+              required
+            />
+          </label>
+          <div class="call-mode" role="group" aria-label="Call mode">
+            <button type="button" class="mode active" data-mode="video" id="mode-video">
+              Video call
+            </button>
+            <button type="button" class="mode" data-mode="audio" id="mode-audio">
+              Audio only
+            </button>
+          </div>
+          <button type="submit" class="cta" id="join-btn">Join room</button>
+          <p id="lobby-error" class="error" hidden></p>
+        </form>
+      </section>
+
+      <section id="call" class="call" hidden>
+        <header class="call-bar">
+          <div>
+            <p class="brand-mark small">Rudra</p>
+            <p class="room-meta">
+              Room <strong id="active-room"></strong>
+              <span id="call-status">Connecting…</span>
+            </p>
+          </div>
+          <p class="peer-name" id="remote-name">Waiting for peer</p>
+        </header>
+
+        <div class="stage" id="stage">
+          <video id="remote-video" class="remote" autoplay playsinline></video>
+          <div id="remote-placeholder" class="placeholder">
+            <span id="placeholder-text">Waiting for someone to join…</span>
+          </div>
+          <div class="local-wrap">
+            <video id="local-video" class="local" autoplay playsinline muted></video>
+            <p class="you-label" id="local-label">You</p>
+          </div>
+        </div>
+
+        <div class="controls" role="toolbar" aria-label="Call controls">
+          <button type="button" class="ctrl" id="toggle-audio" aria-pressed="false" title="Mute">
+            Mic
+          </button>
+          <button type="button" class="ctrl" id="toggle-video" aria-pressed="false" title="Camera">
+            Cam
+          </button>
+          <button type="button" class="ctrl hangup" id="hangup" title="Leave call">
+            Leave
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
