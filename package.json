@@ -1,0 +1,25 @@
+{
+  "name": "rudra-webrtc-server",
+  "version": "1.0.0",
+  "description": "WebRTC signaling server for video and audio calls",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "webrtc",
+    "video-call",
+    "audio-call",
+    "signaling"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}
