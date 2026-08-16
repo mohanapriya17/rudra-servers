@@ -73,6 +73,10 @@ Local dependencies (optional):
 docker compose -f docker/docker-compose.yml up -d
 ```
 
+## Postman
+
+Import `postman/Rudra-Backend.postman_collection.json` and `postman/Rudra-Local.postman_environment.json` to exercise every HTTP API. See `postman/README.md`.
+
 ## Development phases
 
 | Phase | Status | Scope |
