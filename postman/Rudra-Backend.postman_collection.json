@@ -1,0 +1,5924 @@
+{
+  "info": {
+    "_postman_id": "862ad547-1bd6-4f92-9056-ec7afa8b5b6f",
+    "name": "Rudra Backend Platform",
+    "description": "Complete HTTP collection for the Rudra headless backend monorepo.\n\n## Services\n| Service | Default port | Base path |\n|---------|--------------|-----------|\n| Control Plane | 4000 | `/api/v1` |\n| PostgreSQL API | 4001 | `/api/v1/postgres` |\n| MongoDB API | 4002 | `/api/v1/mongodb` |\n| GraphQL API | 4003 | `/api/v1/graphql` + `/graphql` |\n| Realtime API | 4004 | `/api/v1/realtime` (+ WS `/ws`, `/yjs/:id`) |\n| WebRTC API | 4005 | `/api/v1/webrtc` (+ WS `/ws`) |\n| File API | 4006 | `/api/v1/files` |\n| Function API | 4007 | `/api/v1/functions` |\n\n## Setup\n1. Import this collection and `Rudra-Local.postman_environment.json`.\n2. Select the **Rudra Local** environment.\n3. Start services (`pnpm --filter @rudra/<app> start`) and optional `docker compose -f docker/docker-compose.yml up -d`.\n4. Run folders in order where noted (Control Plane → Postgres/Mongo → GraphQL).\n\nSuccessful create requests write IDs into collection variables automatically.\n\n## WebSockets\nRealtime (`ws://localhost:4004/ws`, `/yjs/:documentId`) and WebRTC signaling (`ws://localhost:4005/ws`)\nare documented under those folders but require a WebSocket client (Postman WS, wscat, or a browser).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "controlPlaneUrl",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "postgresUrl",
+      "value": "http://localhost:4001"
+    },
+    {
+      "key": "mongodbUrl",
+      "value": "http://localhost:4002"
+    },
+    {
+      "key": "graphqlUrl",
+      "value": "http://localhost:4003"
+    },
+    {
+      "key": "realtimeUrl",
+      "value": "http://localhost:4004"
+    },
+    {
+      "key": "webrtcUrl",
+      "value": "http://localhost:4005"
+    },
+    {
+      "key": "fileUrl",
+      "value": "http://localhost:4006"
+    },
+    {
+      "key": "functionUrl",
+      "value": "http://localhost:4007"
+    },
+    {
+      "key": "postgresConnectionString",
+      "value": "postgres://rudra:rudra@localhost:5432/rudra"
+    },
+    {
+      "key": "mongodbConnectionString",
+      "value": "mongodb://localhost:27017/rudra"
+    },
+    {
+      "key": "appId",
+      "value": ""
+    },
+    {
+      "key": "environmentId",
+      "value": ""
+    },
+    {
+      "key": "secretId",
+      "value": ""
+    },
+    {
+      "key": "dataSourceId",
+      "value": ""
+    },
+    {
+      "key": "resourceId",
+      "value": ""
+    },
+    {
+      "key": "fieldId",
+      "value": ""
+    },
+    {
+      "key": "apiKeyId",
+      "value": ""
+    },
+    {
+      "key": "apiKey",
+      "value": ""
+    },
+    {
+      "key": "pgSource",
+      "value": "main"
+    },
+    {
+      "key": "pgResource",
+      "value": "projects"
+    },
+    {
+      "key": "pgRowId",
+      "value": ""
+    },
+    {
+      "key": "mongoSource",
+      "value": "main"
+    },
+    {
+      "key": "mongoResource",
+      "value": "messages"
+    },
+    {
+      "key": "mongoDocId",
+      "value": ""
+    },
+    {
+      "key": "graphqlSchemaId",
+      "value": ""
+    },
+    {
+      "key": "graphqlSchemaName",
+      "value": "application-api"
+    },
+    {
+      "key": "fileId",
+      "value": ""
+    },
+    {
+      "key": "functionId",
+      "value": ""
+    },
+    {
+      "key": "functionName",
+      "value": "hello"
+    },
+    {
+      "key": "webrtcRoomId",
+      "value": ""
+    },
+    {
+      "key": "webrtcToken",
+      "value": ""
+    },
+    {
+      "key": "webrtcPeerId",
+      "value": ""
+    },
+    {
+      "key": "realtimeToken",
+      "value": ""
+    },
+    {
+      "key": "pgSourceId",
+      "value": ""
+    },
+    {
+      "key": "pgClientId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 Health & Ready",
+      "description": "Health and readiness probes for every service.",
+      "item": [
+        {
+          "name": "Control Plane — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{controlPlaneUrl}}/health",
+              "host": [
+                "{{controlPlaneUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Control Plane — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{controlPlaneUrl}}/ready",
+              "host": [
+                "{{controlPlaneUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Postgres — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{postgresUrl}}/health",
+              "host": [
+                "{{postgresUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Postgres — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{postgresUrl}}/ready",
+              "host": [
+                "{{postgresUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "MongoDB — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mongodbUrl}}/health",
+              "host": [
+                "{{mongodbUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "MongoDB — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{mongodbUrl}}/ready",
+              "host": [
+                "{{mongodbUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GraphQL — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/health",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GraphQL — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/ready",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Realtime — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{realtimeUrl}}/health",
+              "host": [
+                "{{realtimeUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Realtime — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{realtimeUrl}}/ready",
+              "host": [
+                "{{realtimeUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WebRTC — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{webrtcUrl}}/health",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WebRTC — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{webrtcUrl}}/ready",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/health",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "File — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/ready",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Function — Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/health",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Function — Ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/ready",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 Control Plane",
+      "description": "Apps, environments, secrets, datasources, resources, fields, indexes, relations, API keys.\nBase: `{{controlPlaneUrl}}/api/v1`",
+      "item": [
+        {
+          "name": "Apps",
+          "description": "",
+          "item": [
+            {
+              "name": "Create App",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo Application\",\n  \"slug\": \"demo-app\",\n  \"metadata\": {\n    \"owner\": \"postman\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"appId\", value);",
+                      "      console.log(\"Saved appId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Apps",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get App",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps/{{appId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps",
+                    "{{appId}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update App",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps/{{appId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps",
+                    "{{appId}}"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo Application Updated\",\n  \"metadata\": {\n    \"owner\": \"postman\",\n    \"tier\": \"dev\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete App",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps/{{appId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps",
+                    "{{appId}}"
+                  ]
+                },
+                "description": "Destructive — run last if you need the app for other requests."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Environments",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Environment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps/{{appId}}/environments",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps",
+                    "{{appId}}",
+                    "environments"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"development\",\n  \"slug\": \"development\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"environmentId\", value);",
+                      "      console.log(\"Saved environmentId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Environments",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/apps/{{appId}}/environments",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "apps",
+                    "{{appId}}",
+                    "environments"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Secrets",
+          "description": "Plaintext values are never returned after create.",
+          "item": [
+            {
+              "name": "Create Secret",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/secrets",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "secrets"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"DATABASE_URL\",\n  \"value\": \"postgres://rudra:rudra@localhost:5432/rudra\",\n  \"environmentId\": \"{{environmentId}}\",\n  \"applicationId\": \"{{appId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"secretId\", value);",
+                      "      console.log(\"Saved secretId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Secrets",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/secrets?environmentId={{environmentId}}&applicationId={{appId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "secrets"
+                  ],
+                  "query": [
+                    {
+                      "key": "environmentId",
+                      "value": "{{environmentId}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "applicationId",
+                      "value": "{{appId}}",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Secret Meta",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/secrets/{{secretId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "secrets",
+                    "{{secretId}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Sources",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Data Source",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/datasources",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "datasources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"applicationId\": \"{{appId}}\",\n  \"environmentId\": \"{{environmentId}}\",\n  \"name\": \"main-db\",\n  \"type\": \"postgres\",\n  \"connectionSecretId\": \"{{secretId}}\",\n  \"ssl\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"dataSourceId\", value);",
+                      "      console.log(\"Saved dataSourceId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Data Sources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/datasources?applicationId={{appId}}&environmentId={{environmentId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "datasources"
+                  ],
+                  "query": [
+                    {
+                      "key": "applicationId",
+                      "value": "{{appId}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "environmentId",
+                      "value": "{{environmentId}}",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Data Source",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/datasources/{{dataSourceId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "datasources",
+                    "{{dataSourceId}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Resources & Metadata",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Resource",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dataSourceId\": \"{{dataSourceId}}\",\n  \"name\": \"projects\",\n  \"kind\": \"table\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"resourceId\", value);",
+                      "      console.log(\"Saved resourceId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Resources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/datasources/{{dataSourceId}}/resources",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "datasources",
+                    "{{dataSourceId}}",
+                    "resources"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Resource",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Field",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/fields",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "fields"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"name\",\n  \"type\": \"varchar\",\n  \"length\": 255,\n  \"nullable\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"fieldId\", value);",
+                      "      console.log(\"Saved fieldId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Fields",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/fields",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "fields"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Field",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/fields/{{fieldId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "fields",
+                    "{{fieldId}}"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nullable\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Index",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/indexes",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "indexes"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"projects_name_idx\",\n  \"type\": \"btree\",\n  \"fields\": [\n    \"name\"\n  ],\n  \"unique\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Indexes",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/indexes",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "indexes"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Relation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/relations",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "relations"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"field\": \"clientId\",\n  \"references\": {\n    \"resource\": \"clients\",\n    \"field\": \"id\"\n  },\n  \"onDelete\": \"cascade\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Relations",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/relations",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "relations"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Field",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/resources/{{resourceId}}/fields/{{fieldId}}?confirm=true",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "resources",
+                    "{{resourceId}}",
+                    "fields",
+                    "{{fieldId}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "confirm",
+                      "value": "true",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Requires confirm=true"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "API Keys",
+          "description": "",
+          "item": [
+            {
+              "name": "Create API Key",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/api-keys",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "api-keys"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"applicationId\": \"{{appId}}\",\n  \"environmentId\": \"{{environmentId}}\",\n  \"name\": \"postman\",\n  \"scopes\": [\n    \"read\",\n    \"write\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"apiKeyId\", value);",
+                      "      console.log(\"Saved apiKeyId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}",
+                      "try {",
+                      "  const json = pm.response.json();",
+                      "  if (json?.data?.key) pm.collectionVariables.set(\"apiKey\", json.data.key);",
+                      "} catch (e) {}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List API Keys",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/api-keys?applicationId={{appId}}&environmentId={{environmentId}}",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "api-keys"
+                  ],
+                  "query": [
+                    {
+                      "key": "applicationId",
+                      "value": "{{appId}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "environmentId",
+                      "value": "{{environmentId}}",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Revoke API Key",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{controlPlaneUrl}}/api/v1/api-keys/{{apiKeyId}}/revoke",
+                  "host": [
+                    "{{controlPlaneUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "api-keys",
+                    "{{apiKeyId}}",
+                    "revoke"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 PostgreSQL API",
+      "description": "Physical table mapping, DDL, CRUD, query, bulk, upsert, transactions.\nBase: `{{postgresUrl}}/api/v1/postgres`\nRequires Postgres (e.g. docker compose).",
+      "item": [
+        {
+          "name": "Data Sources",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Data Source",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/datasources",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "datasources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"{{pgSource}}\",\n  \"connectionString\": \"{{postgresConnectionString}}\",\n  \"ssl\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "try {",
+                      "  const json = pm.response.json();",
+                      "  if (json?.data?.name) pm.collectionVariables.set(\"pgSource\", json.data.name);",
+                      "  if (json?.data?.id) pm.collectionVariables.set(\"pgSourceId\", json.data.id);",
+                      "} catch (e) {}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Data Sources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/datasources",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "datasources"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Data Source",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/datasources/{{pgSource}}",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "datasources",
+                    "{{pgSource}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Schema / Resources",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Resource (clients)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"clients\",\n  \"fields\": [\n    {\n      \"name\": \"id\",\n      \"type\": \"uuid\",\n      \"primaryKey\": true,\n      \"nullable\": false\n    },\n    {\n      \"name\": \"email\",\n      \"type\": \"varchar\",\n      \"length\": 255,\n      \"unique\": true,\n      \"nullable\": false\n    },\n    {\n      \"name\": \"name\",\n      \"type\": \"varchar\",\n      \"length\": 120,\n      \"nullable\": false\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Resource (projects)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"projects\",\n  \"fields\": [\n    {\n      \"name\": \"id\",\n      \"type\": \"uuid\",\n      \"primaryKey\": true,\n      \"nullable\": false\n    },\n    {\n      \"name\": \"name\",\n      \"type\": \"varchar\",\n      \"length\": 255,\n      \"nullable\": false\n    },\n    {\n      \"name\": \"status\",\n      \"type\": \"varchar\",\n      \"length\": 40,\n      \"nullable\": true,\n      \"default\": \"active\"\n    },\n    {\n      \"name\": \"budget\",\n      \"type\": \"numeric\",\n      \"precision\": 12,\n      \"scale\": 2,\n      \"nullable\": true\n    },\n    {\n      \"name\": \"clientId\",\n      \"type\": \"uuid\",\n      \"nullable\": true\n    },\n    {\n      \"name\": \"createdAt\",\n      \"type\": \"timestamptz\",\n      \"nullable\": false\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "pm.collectionVariables.set(\"pgResource\", \"projects\");"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Resources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Resource",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources/{{pgResource}}",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources",
+                    "{{pgResource}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Add Field",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources/{{pgResource}}/fields",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources",
+                    "{{pgResource}}",
+                    "fields"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"description\",\n  \"type\": \"text\",\n  \"nullable\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Field (nullable)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources/{{pgResource}}/fields/budget",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources",
+                    "{{pgResource}}",
+                    "fields",
+                    "budget"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nullable\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Index",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources/{{pgResource}}/indexes",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources",
+                    "{{pgResource}}",
+                    "indexes"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"projects_status_idx\",\n  \"type\": \"btree\",\n  \"fields\": [\n    \"status\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Relation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources/{{pgResource}}/relations",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources",
+                    "{{pgResource}}",
+                    "relations"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"field\": \"clientId\",\n  \"references\": {\n    \"resource\": \"clients\",\n    \"field\": \"id\"\n  },\n  \"onDelete\": \"set null\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Field",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/resources/{{pgResource}}/fields/description?confirm=true",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "resources",
+                    "{{pgResource}}",
+                    "fields",
+                    "description"
+                  ],
+                  "query": [
+                    {
+                      "key": "confirm",
+                      "value": "true",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Requires confirm=true"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data CRUD",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Client Row",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/clients",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "clients"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"alice@example.com\",\n  \"name\": \"Alice\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "try {",
+                      "  const json = pm.response.json();",
+                      "  if (json?.data?.id) pm.collectionVariables.set(\"pgClientId\", json.data.id);",
+                      "} catch (e) {}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Project Row",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Website Redesign\",\n  \"status\": \"active\",\n  \"budget\": 12000,\n  \"clientId\": \"{{pgClientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "if (pm.response.code !== 204) {",
+                      "  try {",
+                      "    const json = pm.response.json();",
+                      "    const value = json?.data?.id;",
+                      "    if (value != null) {",
+                      "      pm.collectionVariables.set(\"pgRowId\", value);",
+                      "      console.log(\"Saved pgRowId=\" + value);",
+                      "    }",
+                      "  } catch (e) {}",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Rows",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}?page=1&limit=20&sort=createdAt&order=desc",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    },
+                    {
+                      "key": "sort",
+                      "value": "createdAt",
+                      "disabled": false
+                    },
+                    {
+                      "key": "order",
+                      "value": "desc",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Row",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/{{pgRowId}}",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "{{pgRowId}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Row",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/{{pgRowId}}",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "{{pgRowId}}"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"paused\",\n  \"budget\": 15000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Query Rows",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/query",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "query"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"where\": {\n    \"status\": {\n      \"eq\": \"paused\"\n    }\n  },\n  \"orderBy\": [\n    {\n      \"field\": \"name\",\n      \"direction\": \"asc\"\n    }\n  ],\n  \"limit\": 20,\n  \"offset\": 0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Query Aggregate",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/query",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "query"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"aggregate\": {\n    \"count\": true,\n    \"sum\": [\n      \"budget\"\n    ],\n    \"avg\": [\n      \"budget\"\n    ],\n    \"groupBy\": [\n      \"status\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Upsert Row",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/clients/upsert",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "clients",
+                    "upsert"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"conflictFields\": [\n    \"email\"\n  ],\n  \"data\": {\n    \"email\": \"alice@example.com\",\n    \"name\": \"Alice Updated\"\n  },\n  \"updateFields\": [\n    \"name\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/bulk",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "bulk"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"records\": [\n    {\n      \"name\": \"Bulk A\",\n      \"status\": \"active\",\n      \"budget\": 100\n    },\n    {\n      \"name\": \"Bulk B\",\n      \"status\": \"active\",\n      \"budget\": 200\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Update",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/bulk",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "bulk"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"records\": [\n    {\n      \"id\": \"{{pgRowId}}\",\n      \"data\": {\n        \"status\": \"active\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Transaction",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/transaction",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "transaction"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"operations\": [\n    {\n      \"operation\": \"create\",\n      \"resource\": \"projects\",\n      \"data\": {\n        \"name\": \"Tx Project\",\n        \"status\": \"active\",\n        \"budget\": 50\n      }\n    },\n    {\n      \"operation\": \"update\",\n      \"resource\": \"projects\",\n      \"id\": \"{{pgRowId}}\",\n      \"data\": {\n        \"status\": \"done\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/bulk",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "bulk"
+                  ]
+                },
+                "description": "Destructive — adjust IDs as needed.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    \"{{pgRowId}}\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Row",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{postgresUrl}}/api/v1/postgres/{{pgSource}}/data/{{pgResource}}/{{pgRowId}}",
+                  "host": [
+                    "{{postgresUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "postgres",
+                    "{{pgSource}}",
+                    "data",
+                    "{{pgResource}}",
+                    "{{pgRowId}}"
+                  ]
+                },
+                "description": "May 404 if already bulk-deleted."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 MongoDB API",
+      "description": "Collections, validators, CRUD, query, aggregation, bulk.\nBase: `{{mongodbUrl}}/api/v1/mongodb`",
+      "item": [
+        {
+          "name": "Data Sources",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Data Source",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/datasources",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "datasources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"{{mongoSource}}\",\n  \"connectionString\": \"{{mongodbConnectionString}}\",\n  \"database\": \"rudra\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "try {",
+                      "  const json = pm.response.json();",
+                      "  if (json?.data?.name) pm.collectionVariables.set(\"mongoSource\", json.data.name);",
+                      "} catch (e) {}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Data Sources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/datasources",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "datasources"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Data Source",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/datasources/{{mongoSource}}",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "datasources",
+                    "{{mongoSource}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Resources",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Resource",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/resources",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "resources"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"messages\",\n  \"validationLevel\": \"moderate\",\n  \"validationAction\": \"error\",\n  \"schema\": {\n    \"text\": {\n      \"type\": \"string\",\n      \"required\": true\n    },\n    \"channel\": {\n      \"type\": \"string\",\n      \"required\": true\n    },\n    \"score\": {\n      \"type\": \"int\"\n    },\n    \"createdAt\": {\n      \"type\": \"date\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "pm.collectionVariables.set(\"mongoResource\", \"messages\");"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Resources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/resources",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "resources"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Resource",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/resources/{{mongoResource}}",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "resources",
+                    "{{mongoResource}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Schema",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/resources/{{mongoResource}}/schema",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "resources",
+                    "{{mongoResource}}",
+                    "schema"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"validationLevel\": \"moderate\",\n  \"validationAction\": \"warn\",\n  \"schema\": {\n    \"text\": {\n      \"type\": \"string\",\n      \"required\": true\n    },\n    \"channel\": {\n      \"type\": \"string\",\n      \"required\": true\n    },\n    \"score\": {\n      \"type\": \"int\"\n    },\n    \"tags\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"createdAt\": {\n      \"type\": \"date\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Index",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/resources/{{mongoResource}}/indexes",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "resources",
+                    "{{mongoResource}}",
+                    "indexes"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"messages_channel_idx\",\n  \"fields\": {\n    \"channel\": 1\n  },\n  \"unique\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data CRUD",
+          "description": "",
+          "item": [
+            {
+              "name": "Create Document",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"Hello Rudra\",\n  \"channel\": \"general\",\n  \"score\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});",
+                      "try {",
+                      "  const json = pm.response.json();",
+                      "  const id = json?.data?.id ?? json?.data?._id;",
+                      "  if (id) pm.collectionVariables.set(\"mongoDocId\", id);",
+                      "} catch (e) {}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Documents",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}?page=1&limit=20&sort=createdAt&order=desc",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "disabled": false
+                    },
+                    {
+                      "key": "sort",
+                      "value": "createdAt",
+                      "disabled": false
+                    },
+                    {
+                      "key": "order",
+                      "value": "desc",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Document",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/{{mongoDocId}}",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "{{mongoDocId}}"
+                  ]
+                },
+                "description": ""
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Document",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/{{mongoDocId}}",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "{{mongoDocId}}"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"score\": 42,\n  \"tags\": [\n    \"postman\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Query Documents",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/query",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "query"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"where\": {\n    \"channel\": {\n      \"eq\": \"general\"\n    }\n  },\n  \"sort\": [\n    {\n      \"field\": \"score\",\n      \"direction\": \"desc\"\n    }\n  ],\n  \"limit\": 20,\n  \"skip\": 0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Aggregate",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/aggregate",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "aggregate"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"stages\": [\n    {\n      \"stage\": \"match\",\n      \"spec\": {\n        \"channel\": \"general\"\n      }\n    },\n    {\n      \"stage\": \"group\",\n      \"spec\": {\n        \"_id\": \"$channel\",\n        \"total\": {\n          \"$sum\": \"$score\"\n        },\n        \"count\": {\n          \"$sum\": 1\n        }\n      }\n    },\n    {\n      \"stage\": \"sort\",\n      \"spec\": {\n        \"count\": -1\n      }\n    },\n    {\n      \"stage\": \"limit\",\n      \"spec\": 10\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/bulk",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "bulk"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"records\": [\n    {\n      \"text\": \"Bulk 1\",\n      \"channel\": \"ops\",\n      \"score\": 1\n    },\n    {\n      \"text\": \"Bulk 2\",\n      \"channel\": \"ops\",\n      \"score\": 2\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Update",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/bulk",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "bulk"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"records\": [\n    {\n      \"id\": \"{{mongoDocId}}\",\n      \"data\": {\n        \"score\": 99\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Request-Id",
+                    "value": "{{$guid}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/bulk",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "bulk"
+                  ]
+                },
+                "description": "",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    \"{{mongoDocId}}\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete Document",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{mongodbUrl}}/api/v1/mongodb/{{mongoSource}}/data/{{mongoResource}}/{{mongoDocId}}",
+                  "host": [
+                    "{{mongodbUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "mongodb",
+                    "{{mongoSource}}",
+                    "data",
+                    "{{mongoResource}}",
+                    "{{mongoDocId}}"
+                  ]
+                },
+                "description": "May 404 if already bulk-deleted."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"status is success\", function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 GraphQL API",
+      "description": "Dynamic schema management + query execution.\nManagement: `{{graphqlUrl}}/api/v1/graphql`\nExecute: `POST {{graphqlUrl}}/graphql`",
+      "item": [
+        {
+          "name": "Create Schema",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"application-api\",\n  \"introspection\": true,\n  \"queryDepthLimit\": 10,\n  \"queryComplexityLimit\": 1000,\n  \"types\": [\n    {\n      \"name\": \"Project\",\n      \"kind\": \"object\",\n      \"fields\": [\n        {\n          \"name\": \"id\",\n          \"type\": \"ID!\",\n          \"resolver\": {\n            \"type\": \"parent\",\n            \"field\": \"id\"\n          }\n        },\n        {\n          \"name\": \"name\",\n          \"type\": \"String!\",\n          \"resolver\": {\n            \"type\": \"parent\",\n            \"field\": \"name\"\n          }\n        },\n        {\n          \"name\": \"city\",\n          \"type\": \"String\",\n          \"resolver\": {\n            \"type\": \"parent\",\n            \"field\": \"city\"\n          }\n        }\n      ]\n    }\n  ],\n  \"queries\": [\n    {\n      \"name\": \"projects\",\n      \"type\": \"[Project!]!\",\n      \"resolver\": {\n        \"type\": \"static\",\n        \"value\": [\n          {\n            \"id\": \"1\",\n            \"name\": \"Website\",\n            \"city\": \"Austin\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"hello\",\n      \"type\": \"String!\",\n      \"resolver\": {\n        \"type\": \"static\",\n        \"value\": \"hello from rudra\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "if (pm.response.code !== 204) {",
+                  "  try {",
+                  "    const json = pm.response.json();",
+                  "    const value = json?.data?.id;",
+                  "    if (value != null) {",
+                  "      pm.collectionVariables.set(\"graphqlSchemaId\", value);",
+                  "      console.log(\"Saved graphqlSchemaId=\" + value);",
+                  "    }",
+                  "  } catch (e) {}",
+                  "}",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json?.data?.name) pm.collectionVariables.set(\"graphqlSchemaName\", json.data.name);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Schemas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Schema",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas/{{graphqlSchemaName}}",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas",
+                "{{graphqlSchemaName}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas/{{graphqlSchemaName}}/types",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas",
+                "{{graphqlSchemaName}}",
+                "types"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Client\",\n  \"kind\": \"object\",\n  \"fields\": [\n    {\n      \"name\": \"id\",\n      \"type\": \"ID!\",\n      \"resolver\": {\n        \"type\": \"parent\",\n        \"field\": \"id\"\n      }\n    },\n    {\n      \"name\": \"email\",\n      \"type\": \"String!\",\n      \"resolver\": {\n        \"type\": \"parent\",\n        \"field\": \"email\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set Queries",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas/{{graphqlSchemaName}}/queries",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas",
+                "{{graphqlSchemaName}}",
+                "queries"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"projects\",\n    \"type\": \"[Project!]!\",\n    \"resolver\": {\n      \"type\": \"static\",\n      \"value\": [\n        {\n          \"id\": \"1\",\n          \"name\": \"Website\",\n          \"city\": \"Austin\"\n        }\n      ]\n    }\n  },\n  {\n    \"name\": \"hello\",\n    \"type\": \"String!\",\n    \"resolver\": {\n      \"type\": \"static\",\n      \"value\": \"hello from rudra\"\n    }\n  },\n  {\n    \"name\": \"projectById\",\n    \"type\": \"Project\",\n    \"args\": [\n      {\n        \"name\": \"id\",\n        \"type\": \"ID!\"\n      }\n    ],\n    \"resolver\": {\n      \"type\": \"postgres\",\n      \"dataSourceId\": \"main\",\n      \"resource\": \"projects\",\n      \"operation\": \"findOne\",\n      \"idArg\": \"id\"\n    }\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set Mutations",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas/{{graphqlSchemaName}}/mutations",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas",
+                "{{graphqlSchemaName}}",
+                "mutations"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"echo\",\n    \"type\": \"String!\",\n    \"args\": [\n      {\n        \"name\": \"message\",\n        \"type\": \"String!\"\n      }\n    ],\n    \"resolver\": {\n      \"type\": \"function\",\n      \"functionId\": \"{{functionName}}\"\n    }\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Execute (schema path)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/api/v1/graphql/schemas/{{graphqlSchemaName}}/graphql",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "graphql",
+                "schemas",
+                "{{graphqlSchemaName}}",
+                "graphql"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ hello projects { id name city } }\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Execute (default /graphql)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/graphql?schema={{graphqlSchemaName}}",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ],
+              "query": [
+                {
+                  "key": "schema",
+                  "value": "{{graphqlSchemaName}}",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query GetProjects { projects { id name } }\",\n  \"variables\": {},\n  \"operationName\": \"GetProjects\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GraphQL Landing Page",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{graphqlUrl}}/graphql",
+              "host": [
+                "{{graphqlUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 File API",
+      "description": "Presigned upload/download flow (S3/R2 or memory fallback).\nBase: `{{fileUrl}}/api/v1/files`",
+      "item": [
+        {
+          "name": "Create Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/api/v1/files/upload-url",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "files",
+                "upload-url"
+              ]
+            },
+            "description": "Response includes uploadUrl. For memory driver, PUT/POST the bytes to that URL (or skip and call complete).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"demo.txt\",\n  \"mimeType\": \"text/plain\",\n  \"size\": 12,\n  \"visibility\": \"private\",\n  \"applicationId\": \"{{appId}}\",\n  \"environmentId\": \"{{environmentId}}\",\n  \"metadata\": {\n    \"source\": \"postman\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json?.data?.fileId) pm.collectionVariables.set(\"fileId\", json.data.fileId);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Complete Upload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/api/v1/files/{{fileId}}/complete",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "files",
+                "{{fileId}}",
+                "complete"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Download URL",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/api/v1/files/{{fileId}}/download-url",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "files",
+                "{{fileId}}",
+                "download-url"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Files",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/api/v1/files?applicationId={{appId}}&environmentId={{environmentId}}",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "files"
+              ],
+              "query": [
+                {
+                  "key": "applicationId",
+                  "value": "{{appId}}",
+                  "disabled": false
+                },
+                {
+                  "key": "environmentId",
+                  "value": "{{environmentId}}",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get File Meta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/api/v1/files/{{fileId}}",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "files",
+                "{{fileId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete File",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{fileUrl}}/api/v1/files/{{fileId}}",
+              "host": [
+                "{{fileUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "files",
+                "{{fileId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 Realtime API",
+      "description": "HTTP token mint + WebSocket docs.\nWS: `ws://localhost:4004/ws`\nYjs: `ws://localhost:4004/yjs/:documentId`",
+      "item": [
+        {
+          "name": "Create Realtime Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{realtimeUrl}}/api/v1/realtime/tokens",
+              "host": [
+                "{{realtimeUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "realtime",
+                "tokens"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"alice\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json?.data?.token) pm.collectionVariables.set(\"realtimeToken\", json.data.token);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WebSocket — Channel Protocol (docs)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{realtimeUrl}}/ws",
+              "host": [
+                "{{realtimeUrl}}"
+              ],
+              "path": [
+                "ws"
+              ]
+            },
+            "description": "Not an HTTP request — open a WebSocket to `ws://localhost:4004/ws`.\n\nTypical client flow:\n1. Connect with `?token={{realtimeToken}}` (or send auth message after connect).\n2. Subscribe to a channel, publish events, track presence.\n3. For CRDT docs, connect to `ws://localhost:4004/yjs/<documentId>`.\n\nUse Postman’s WebSocket request type, `wscat`, or a browser client."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 WebRTC API",
+      "description": "Rooms, join, TURN credentials, signaling notes.\nBase: `{{webrtcUrl}}/api/v1/webrtc`\nSignaling WS: `ws://localhost:4005/ws`",
+      "item": [
+        {
+          "name": "Create Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{webrtcUrl}}/api/v1/webrtc/rooms",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webrtc",
+                "rooms"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json?.data?.roomId) pm.collectionVariables.set(\"webrtcRoomId\", json.data.roomId);",
+                  "  if (json?.data?.token) pm.collectionVariables.set(\"webrtcToken\", json.data.token);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Join Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{webrtcUrl}}/api/v1/webrtc/rooms/{{webrtcRoomId}}/join",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webrtc",
+                "rooms",
+                "{{webrtcRoomId}}",
+                "join"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"peer-a\",\n  \"token\": \"{{webrtcToken}}\",\n  \"capabilities\": {\n    \"audio\": true,\n    \"video\": true,\n    \"screen\": true,\n    \"data\": true\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json?.data?.peerId) pm.collectionVariables.set(\"webrtcPeerId\", json.data.peerId);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Room",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{webrtcUrl}}/api/v1/webrtc/rooms/{{webrtcRoomId}}",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webrtc",
+                "rooms",
+                "{{webrtcRoomId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TURN Credentials",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{webrtcUrl}}/api/v1/webrtc/turn-credentials",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webrtc",
+                "turn-credentials"
+              ]
+            },
+            "description": "Requires TURN_URL + TURN_SECRET env vars; otherwise returns 503.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responds\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "WebSocket — Signaling (docs)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{webrtcUrl}}/ws",
+              "host": [
+                "{{webrtcUrl}}"
+              ],
+              "path": [
+                "ws"
+              ]
+            },
+            "description": "Not an HTTP request — open a WebSocket to `ws://localhost:4005/ws`.\n\nAfter joining a room via HTTP, exchange offer/answer/ICE through the signaling socket.\nAlso supports screen-share and datachannel-related control messages.\n\nUse Postman’s WebSocket request type or a browser WebRTC client."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 Function API",
+      "description": "Trusted JS functions — create, invoke, webhook.\nBase: `{{functionUrl}}/api/v1/functions`",
+      "item": [
+        {
+          "name": "Create Function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/api/v1/functions",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"hello\",\n  \"description\": \"Echo input.message\",\n  \"runtime\": \"trusted-js\",\n  \"timeoutMs\": 5000,\n  \"triggers\": [\n    \"http\",\n    \"webhook\",\n    \"manual\"\n  ],\n  \"secrets\": [],\n  \"code\": \"return { ok: true, message: (input && input.message) || 'hello' };\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "if (pm.response.code !== 204) {",
+                  "  try {",
+                  "    const json = pm.response.json();",
+                  "    const value = json?.data?.id;",
+                  "    if (value != null) {",
+                  "      pm.collectionVariables.set(\"functionId\", value);",
+                  "      console.log(\"Saved functionId=\" + value);",
+                  "    }",
+                  "  } catch (e) {}",
+                  "}",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json?.data?.name) pm.collectionVariables.set(\"functionName\", json.data.name);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Functions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/api/v1/functions",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Function",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/api/v1/functions/{{functionId}}",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions",
+                "{{functionId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invoke Function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/api/v1/functions/{{functionId}}/invoke",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions",
+                "{{functionId}}",
+                "invoke"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": {\n    \"message\": \"from postman\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Webhook Trigger",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{functionUrl}}/api/v1/functions/{{functionName}}/webhook",
+              "host": [
+                "{{functionUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions",
+                "{{functionName}}",
+                "webhook"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"order.created\",\n  \"payload\": {\n    \"id\": \"ord_1\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status is success\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 Suggested Happy-Path Order",
+      "description": "Run these in sequence for an end-to-end smoke through the main APIs.",
+      "item": [
+        {
+          "name": "README — Suggested order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{controlPlaneUrl}}/health",
+              "host": [
+                "{{controlPlaneUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Suggested run order:\n1. 00 Health & Ready (all services)\n2. Control Plane: Create App → Environment → Secret → Data Source → Resource → Field → API Key\n3. PostgreSQL: Create Data Source → resources → CRUD\n4. MongoDB: Create Data Source → resource → CRUD\n5. GraphQL: Create Schema → Execute query\n6. File: upload-url → complete → download-url\n7. Realtime: create token (then WS manually)\n8. WebRTC: create room → join\n9. Function: create → invoke → webhook"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
