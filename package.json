@@ -1,0 +1,26 @@
+{
+  "name": "rudra-backend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Rudra headless backend platform — reusable backend primitives",
+  "packageManager": "pnpm@10.33.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build && pnpm -r --filter './apps/*' build",
+    "build:packages": "pnpm -r --filter './packages/*' build",
+    "build:apps": "pnpm -r --filter './apps/*' build",
+    "dev": "pnpm -r --parallel --filter './apps/*' dev",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --filter './packages/*' test && pnpm -r --filter './apps/*' test",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r exec rm -rf dist coverage .turbo",
+    "health:check": "node scripts/health-check.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}
