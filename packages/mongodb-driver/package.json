@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@rudra/errors": "workspace:*",
+    "@rudra/metadata": "workspace:*",
     "mongodb": "^6.14.2"
   },
   "devDependencies": {

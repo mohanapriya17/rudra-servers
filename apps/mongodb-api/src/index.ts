@@ -1,13 +1,21 @@
 import { loadServiceConfig } from "@rudra/config";
-import { createApp, mountErrorHandlers } from "./app.js";
+import { createApp } from "./app.js";
 
 async function main(): Promise<void> {
   const config = loadServiceConfig("mongodb-api");
-  const { app, logger } = createApp();
-  mountErrorHandlers(app);
+  const { app, logger, clients } = createApp();
 
   const { createServer } = await import("node:http");
   const server = createServer(app);
+
+  const shutdown = async () => {
+    logger.info("shutting down");
+    await clients.closeAll();
+    server.close(() => process.exit(0));
+  };
+  process.on("SIGINT", () => void shutdown());
+  process.on("SIGTERM", () => void shutdown());
+
   await new Promise<void>((resolve, reject) => {
     server.listen(config.port, config.host, () => resolve());
     server.once("error", reject);

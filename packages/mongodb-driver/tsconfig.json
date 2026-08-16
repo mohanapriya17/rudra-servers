@@ -8,9 +8,8 @@
     "src/**/*"
   ],
   "references": [
-    {
-      "path": "../errors"
-    }
+    { "path": "../errors" },
+    { "path": "../metadata" }
   ],
   "exclude": [
     "**/*.test.ts",
