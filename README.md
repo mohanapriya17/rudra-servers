@@ -51,6 +51,13 @@ Start all APIs in watch mode:
 pnpm dev
 ```
 
+`pnpm dev` builds shared packages first (`dist/`), then starts every `*-api` app. If you skipped that and see `ERR_MODULE_NOT_FOUND` for `@rudra/.../dist/...`, run:
+
+```bash
+pnpm build:packages
+pnpm -r --parallel --filter "@rudra/*-api" dev
+```
+
 Start one service:
 
 ```bash
