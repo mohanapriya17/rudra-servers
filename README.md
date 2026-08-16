@@ -43,15 +43,13 @@ Each app is independently runnable and deployable.
 ```bash
 pnpm install
 pnpm build
-```
-
-Start all APIs in watch mode:
-
-```bash
 pnpm dev
 ```
 
-`pnpm dev` builds shared packages first (`dist/`), then starts every `*-api` app. If you skipped that and see `ERR_MODULE_NOT_FOUND` for `@rudra/.../dist/...`, run:
+On Windows / Git Bash, prefer the root scripts (`pnpm build`, `pnpm build:packages`, `pnpm dev`).  
+Do **not** paste filters that contain `!` into Git Bash — `!` is history expansion and fails with `event not found`.
+
+Safe manual equivalents:
 
 ```bash
 pnpm build:packages
