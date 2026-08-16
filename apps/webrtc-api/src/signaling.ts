@@ -58,7 +58,7 @@ export function attachSignaling(server: Server, logger: Logger): WebSocketServer
         return;
       }
 
-      if (type === "offer" || type === "answer" || type === "ice-candidate") {
+      if (type === "offer" || type === "answer" || type === "ice-candidate" || type === "screen-offer" || type === "screen-answer" || type === "datachannel") {
         const target = String(message.target ?? "");
         for (const [peerSocket, peerState] of sockets) {
           if (peerState.roomId === state.roomId && peerState.peerId === target && peerSocket.readyState === WebSocket.OPEN) {
@@ -68,6 +68,8 @@ export function attachSignaling(server: Server, logger: Logger): WebSocketServer
                 from: state.peerId,
                 sdp: message.sdp,
                 candidate: message.candidate,
+                label: message.label,
+                data: message.data,
               }),
             );
           }

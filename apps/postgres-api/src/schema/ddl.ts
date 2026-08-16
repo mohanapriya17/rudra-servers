@@ -107,8 +107,9 @@ export async function createPhysicalIndex(
   const cols = index.fields.map((field) => quoteIdent(field)).join(", ");
   const unique = index.unique ? "UNIQUE " : "";
   const method = index.type;
+  const indexName = quoteIdent(`${resource.physicalTable}_${index.name}`.slice(0, 63));
   await pool.query(
-    `CREATE ${unique}INDEX ${quoteIdent(index.name)} ON ${qualified} USING ${method} (${cols})`,
+    `CREATE ${unique}INDEX ${indexName} ON ${qualified} USING ${method} (${cols})`,
   );
 }
 

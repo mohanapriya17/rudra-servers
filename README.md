@@ -81,12 +81,12 @@ docker compose -f docker/docker-compose.yml up -d
 | 1 | **Done (memory store)** | Control Plane: apps, environments, secrets, datasources, resources, fields, indexes, relations, API keys |
 | 2 | **Done** | PostgreSQL Data API (schema + CRUD + query + bulk + upsert + transactions) |
 | 3 | **Done** | MongoDB Data API (collections, validators, CRUD, query, aggregation, bulk) |
-| 4 | Next | GraphQL API |
-| 5 | Planned | File API |
-| 6 | Planned | Realtime API + Yjs adapter |
-| 7 | Planned | WebRTC signaling (scaffold exists) |
-| 8 | Planned | Function API |
-| 9 | Planned | Hardening only |
+| 4 | **Done** | GraphQL API (dynamic schema, multi-source resolvers, depth/complexity limits) |
+| 5 | **Done** | File API (S3/R2/memory presigned upload/download) |
+| 6 | **Done** | Realtime API (channels, presence, Yjs adapter) |
+| 7 | **Done** | WebRTC signaling (rooms, ICE, STUN/TURN creds, screen/datachannel) |
+| 8 | **Done** | Function API (trusted invoke, webhooks, timeouts) |
+| 9 | **Done** | Hardening baseline (limits, SSRF checks, structured errors, service READMEs) |
 
 ## Error format
 

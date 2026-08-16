@@ -1,33 +1,25 @@
 # Realtime / WebSocket API
 
-Generic WebSocket channels, presence, and Yjs adapter surface.
+Generic realtime server — not a chat product.
+
+## Features
+
+- WebSocket channels (`subscribe` / `publish` / `event`)
+- Presence (`join` / `leave` / `update` / `list`)
+- Direct messaging
+- Heartbeat / rate limits / max subscriptions
+- Yjs adapter at `/yjs/:documentId`
 
 ## Setup
 
 ```bash
-pnpm install
-pnpm --filter @rudra/realtime-api build
 pnpm --filter @rudra/realtime-api start
 ```
 
-## Health
+Port: `4004`
 
-```http
-GET /health
+```text
+ws://host/ws
+ws://host/yjs/:documentId
+POST /api/v1/realtime/tokens
 ```
-
-```json
-{ "status": "ok", "service": "realtime-api" }
-```
-
-## Environment
-
-| Variable | Description |
-|----------|-------------|
-| `PORT` | Override listen port |
-| `HOST` | Bind address (default `0.0.0.0`) |
-| `LOG_LEVEL` | `debug` \| `info` \| `warn` \| `error` |
-
-## Status
-
-Scaffolded in Phase 0. See root README for phase roadmap.
