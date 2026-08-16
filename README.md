@@ -51,14 +51,16 @@ Start all APIs in watch mode:
 pnpm dev
 ```
 
-`pnpm dev` builds shared packages first (`dist/`), then starts every `*-api` app. If you skipped that and see `ERR_MODULE_NOT_FOUND` for `@rudra/.../dist/...`, run:
+App `dev` scripts load shared packages from TypeScript source (`--conditions=development`), so you do **not** need a prior package build for watch mode.
+
+For production-style `start`, build first:
 
 ```bash
-pnpm build:packages
-pnpm -r --parallel --filter "@rudra/*-api" dev
+pnpm build
+pnpm --filter @rudra/control-plane-api start
 ```
 
-Start one service:
+Start one service in watch mode:
 
 ```bash
 pnpm --filter @rudra/control-plane-api start
