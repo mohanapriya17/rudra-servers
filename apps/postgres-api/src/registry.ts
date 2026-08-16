@@ -46,6 +46,22 @@ export class PostgresRegistry {
     return record;
   }
 
+  removeDataSource(source: string): void {
+    const record = (() => {
+      try {
+        return this.resolveDataSource(source);
+      } catch {
+        return undefined;
+      }
+    })();
+    if (!record) return;
+    for (const resource of this.listResources(record.id)) {
+      this.resources.delete(resource.id);
+    }
+    this.dataSources.delete(record.id);
+    this.dataSourcesByName.delete(record.name);
+  }
+
   listDataSources(): PostgresDataSourceRecord[] {
     return [...this.dataSources.values()];
   }
@@ -96,6 +112,10 @@ export class PostgresRegistry {
 
   listResources(dataSourceId: string): PostgresResourceRecord[] {
     return [...this.resources.values()].filter((resource) => resource.dataSourceId === dataSourceId);
+  }
+
+  removeResource(resourceId: string): void {
+    this.resources.delete(resourceId);
   }
 
   resolveResource(dataSourceId: string, resourceNameOrId: string): PostgresResourceRecord {
