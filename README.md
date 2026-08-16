@@ -80,8 +80,8 @@ docker compose -f docker/docker-compose.yml up -d
 | 0 | **Done** | pnpm workspace, TypeScript, shared packages, all apps build/start/`/health` |
 | 1 | **Done (memory store)** | Control Plane: apps, environments, secrets, datasources, resources, fields, indexes, relations, API keys |
 | 2 | **Done** | PostgreSQL Data API (schema + CRUD + query + bulk + upsert + transactions) |
-| 3 | Next | MongoDB Data API |
-| 4 | Planned | GraphQL API |
+| 3 | **Done** | MongoDB Data API (collections, validators, CRUD, query, aggregation, bulk) |
+| 4 | Next | GraphQL API |
 | 5 | Planned | File API |
 | 6 | Planned | Realtime API + Yjs adapter |
 | 7 | Planned | WebRTC signaling (scaffold exists) |
