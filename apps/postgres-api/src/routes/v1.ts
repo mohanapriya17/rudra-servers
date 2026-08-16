@@ -91,7 +91,12 @@ export function createPostgresRouter(
         environmentId: body.environmentId,
         connectionSecretId: body.connectionSecretId,
       });
-      await pools.getPool(ds.id);
+      try {
+        await pools.getPool(ds.id);
+      } catch (error) {
+        registry.removeDataSource(ds.id);
+        throw error;
+      }
       res.status(201).json(data(toPublicDataSource(ds)));
     } catch (error) {
       next(error);
@@ -121,8 +126,13 @@ export function createPostgresRouter(
         fields,
         applicationId: ds.applicationId,
       });
-      const pool = await pools.getPool(ds.id);
-      await createPhysicalTable(pool, resource);
+      try {
+        const pool = await pools.getPool(ds.id);
+        await createPhysicalTable(pool, resource);
+      } catch (error) {
+        registry.removeResource(resource.id);
+        throw error;
+      }
       res.status(201).json(data(resource));
     } catch (error) {
       next(error);
