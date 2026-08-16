@@ -45,12 +45,20 @@ pnpm install
 pnpm build
 ```
 
+Start all APIs in watch mode:
+
+```bash
+pnpm dev
+```
+
 Start one service:
 
 ```bash
 pnpm --filter @rudra/control-plane-api start
 curl http://localhost:4000/health
 ```
+
+> **Windows note:** root scripts use package-name filters (`@rudra/*-api`) instead of `./apps/*` path filters, which fail on Windows with “No projects matched the filters”.
 
 Default ports:
 
