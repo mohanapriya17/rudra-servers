@@ -4,18 +4,19 @@ import { createApp } from "./app.js";
 
 const DATABASE_URL =
   process.env.POSTGRES_TEST_URL ?? "postgres://rudra:rudra@127.0.0.1:5432/rudra_data";
+const RUN_ID = `app-test-${Date.now().toString(36)}`;
 
 describe("postgres-api phase 2 acceptance", () => {
   const { app, pools } = createApp();
   let sourceId = "";
-  let sourceName = "main";
+  let sourceName = `main_${Date.now().toString(36)}`;
 
   beforeAll(async () => {
     const res = await request(app).post("/api/v1/postgres/datasources").send({
       name: sourceName,
       connectionString: DATABASE_URL,
       ssl: false,
-      applicationId: "app-test-01",
+      applicationId: RUN_ID,
     });
     expect(res.status).toBe(201);
     expect(res.body.data.connectionString).toBeUndefined();
