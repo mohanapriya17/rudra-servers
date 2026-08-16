@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-pnpm -r --filter './apps/*' --parallel start &
+pnpm -r --filter '@rudra/*-api' --parallel start &
 PID=$!
 
 cleanup() {

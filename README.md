@@ -45,12 +45,27 @@ pnpm install
 pnpm build
 ```
 
+Start all APIs in watch mode:
+
+```bash
+pnpm dev
+```
+
+`pnpm dev` builds shared packages first (`dist/`), then starts every `*-api` app. If you skipped that and see `ERR_MODULE_NOT_FOUND` for `@rudra/.../dist/...`, run:
+
+```bash
+pnpm build:packages
+pnpm -r --parallel --filter "@rudra/*-api" dev
+```
+
 Start one service:
 
 ```bash
 pnpm --filter @rudra/control-plane-api start
 curl http://localhost:4000/health
 ```
+
+> **Windows note:** root scripts use package-name filters (`@rudra/*-api`) instead of `./apps/*` path filters, which fail on Windows with “No projects matched the filters”.
 
 Default ports:
 

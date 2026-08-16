@@ -8,12 +8,12 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "pnpm -r --filter './packages/*' build && pnpm -r --filter './apps/*' build",
-    "build:packages": "pnpm -r --filter './packages/*' build",
-    "build:apps": "pnpm -r --filter './apps/*' build",
-    "dev": "pnpm -r --parallel --filter './apps/*' dev",
+    "build": "pnpm -r --filter '@rudra/*' --filter '!@rudra/*-api' build && pnpm -r --filter '@rudra/*-api' build",
+    "build:packages": "pnpm -r --filter '@rudra/*' --filter '!@rudra/*-api' build",
+    "build:apps": "pnpm -r --filter '@rudra/*-api' build",
+    "dev": "pnpm run build:packages && pnpm -r --parallel --filter '@rudra/*-api' dev",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r --filter './packages/*' test && pnpm -r --filter './apps/*' test",
+    "test": "pnpm -r --filter '@rudra/*' --filter '!@rudra/*-api' test && pnpm -r --filter '@rudra/*-api' test",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r exec rm -rf dist coverage .turbo",
     "health:check": "node scripts/health-check.mjs"
