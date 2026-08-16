@@ -11,7 +11,7 @@
     "build": "pnpm -r --filter '@rudra/*' --filter '!@rudra/*-api' build && pnpm -r --filter '@rudra/*-api' build",
     "build:packages": "pnpm -r --filter '@rudra/*' --filter '!@rudra/*-api' build",
     "build:apps": "pnpm -r --filter '@rudra/*-api' build",
-    "dev": "pnpm -r --parallel --filter '@rudra/*-api' dev",
+    "dev": "pnpm run build:packages && pnpm -r --parallel --filter '@rudra/*-api' dev",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r --filter '@rudra/*' --filter '!@rudra/*-api' test && pnpm -r --filter '@rudra/*-api' test",
     "lint": "pnpm -r lint",
