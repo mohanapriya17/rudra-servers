@@ -3,16 +3,17 @@ import request from "supertest";
 import { createApp } from "./app.js";
 
 const MONGODB_URL = process.env.MONGODB_TEST_URL ?? "mongodb://127.0.0.1:27017";
+const DB_NAME = `rudra_test_${Date.now().toString(36)}`;
 
 describe("mongodb-api phase 3 acceptance", () => {
   const { app, clients } = createApp();
-  const sourceName = "mongo-main";
+  const sourceName = `mongo-main-${Date.now().toString(36)}`;
 
   beforeAll(async () => {
     const res = await request(app).post("/api/v1/mongodb/datasources").send({
       name: sourceName,
       connectionString: MONGODB_URL,
-      database: "rudra_test",
+      database: DB_NAME,
       applicationId: "app-mongo-01",
     });
     expect(res.status).toBe(201);
@@ -21,6 +22,16 @@ describe("mongodb-api phase 3 acceptance", () => {
 
   afterAll(async () => {
     await clients.closeAll();
+    // best-effort cleanup of ephemeral test DB
+    try {
+      const { MongoClient } = await import("mongodb");
+      const client = new MongoClient(MONGODB_URL);
+      await client.connect();
+      await client.db(DB_NAME).dropDatabase();
+      await client.close();
+    } catch {
+      // ignore cleanup errors
+    }
   });
 
   it("exposes health", async () => {

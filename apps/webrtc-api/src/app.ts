@@ -6,11 +6,18 @@ import { createLogger, type Logger } from "@rudra/logging";
 import { isRudraError, toErrorBody, RudraError } from "@rudra/errors";
 import { createDefaultHttpLimiter } from "@rudra/rate-limit";
 import { z } from "zod";
+import { buildIceServers } from "./turn.js";
 
 interface Peer {
   id: string;
   name: string;
   joinedAt: string;
+  capabilities: {
+    audio: boolean;
+    video: boolean;
+    screen: boolean;
+    data: boolean;
+  };
 }
 
 interface Room {
@@ -24,6 +31,14 @@ const rooms = new Map<string, Room>();
 
 export function getRooms(): Map<string, Room> {
   return rooms;
+}
+
+function iceServersForRequest() {
+  return buildIceServers({
+    turnUrl: process.env.TURN_URL,
+    turnSecret: process.env.TURN_SECRET,
+    turnUsername: process.env.TURN_USERNAME,
+  });
 }
 
 export function createApp(options?: { logger?: Logger }): { app: Express; logger: Logger } {
@@ -60,7 +75,7 @@ export function createApp(options?: { logger?: Logger }): { app: Express; logger
     res.json({
       status: "ok",
       service: "webrtc-api",
-      version: "0.1.0",
+      version: "0.2.0",
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
     });
   });
@@ -82,10 +97,8 @@ export function createApp(options?: { logger?: Logger }): { app: Express; logger
       data: {
         roomId,
         token,
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:stun1.l.google.com:19302" },
-        ],
+        iceServers: iceServersForRequest(),
+        media: { audio: true, video: true, screen: true, dataChannels: true },
       },
     });
   });
@@ -96,6 +109,14 @@ export function createApp(options?: { logger?: Logger }): { app: Express; logger
         .object({
           name: z.string().min(1).max(40).optional(),
           token: z.string().min(1),
+          capabilities: z
+            .object({
+              audio: z.boolean().optional(),
+              video: z.boolean().optional(),
+              screen: z.boolean().optional(),
+              data: z.boolean().optional(),
+            })
+            .optional(),
         })
         .parse(req.body);
       const room = rooms.get(req.params.roomId!);
@@ -110,6 +131,12 @@ export function createApp(options?: { logger?: Logger }): { app: Express; logger
         id: peerId,
         name: body.name ?? `peer-${peerId.slice(0, 4)}`,
         joinedAt: new Date().toISOString(),
+        capabilities: {
+          audio: body.capabilities?.audio ?? true,
+          video: body.capabilities?.video ?? true,
+          screen: body.capabilities?.screen ?? true,
+          data: body.capabilities?.data ?? true,
+        },
       };
       room.peers.set(peerId, peer);
       res.status(201).json({
@@ -117,14 +144,25 @@ export function createApp(options?: { logger?: Logger }): { app: Express; logger
           roomId: room.id,
           peerId,
           name: peer.name,
-          peers: [...room.peers.values()].filter((p) => p.id !== peerId),
+          capabilities: peer.capabilities,
+          peers: [...room.peers.values()]
+            .filter((p) => p.id !== peerId)
+            .map(({ id, name, capabilities }) => ({ id, name, capabilities })),
           signalingPath: "/ws",
-          iceServers: [
-            { urls: "stun:stun.l.google.com:19302" },
-            { urls: "stun:stun1.l.google.com:19302" },
-          ],
+          iceServers: iceServersForRequest(),
         },
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/v1/webrtc/turn-credentials", (_req, res, next) => {
+    try {
+      if (!process.env.TURN_SECRET || !process.env.TURN_URL) {
+        throw new RudraError("SERVICE_UNAVAILABLE", "TURN is not configured");
+      }
+      res.json({ data: { iceServers: iceServersForRequest() } });
     } catch (error) {
       next(error);
     }

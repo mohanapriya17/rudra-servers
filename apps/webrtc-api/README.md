@@ -1,19 +1,15 @@
 # WebRTC Signaling API
 
-Signaling, rooms, peer discovery, and ICE exchange for browser P2P audio/video.
+P2P signaling for audio, video, screen share, and data channels.
 
-Does **not** implement an SFU. Media stays peer-to-peer. TURN can be configured separately (e.g. Coturn).
+Does **not** implement an SFU.
 
-## Endpoints
+## Features
 
-```http
-POST /api/v1/webrtc/rooms
-POST /api/v1/webrtc/rooms/:roomId/join
-GET  /api/v1/webrtc/rooms/:roomId
-WS   /ws
-```
-
-Signaling message types: `join`, `offer`, `answer`, `ice-candidate`, `peer-joined`, `peer-left`, `ping`/`pong`.
+- Room create / join with temporary tokens
+- WebSocket signaling (`offer` / `answer` / ICE / screen / datachannel)
+- STUN by default
+- Optional Coturn TURN with time-limited credentials (`TURN_URL`, `TURN_SECRET`)
 
 ## Setup
 
@@ -21,4 +17,4 @@ Signaling message types: `join`, `offer`, `answer`, `ice-candidate`, `peer-joine
 pnpm --filter @rudra/webrtc-api start
 ```
 
-Default port: `4005`
+Port: `4005`

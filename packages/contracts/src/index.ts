@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export * from "./postgres.js";
 export * from "./mongodb.js";
+export * from "./phase4plus.js";
 
 export const healthResponseSchema = z.object({
   status: z.literal("ok"),
