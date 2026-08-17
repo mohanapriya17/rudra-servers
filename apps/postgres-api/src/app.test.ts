@@ -1,17 +1,29 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
+import type { Express } from "express";
 import { createApp } from "./app.js";
+import { PostgresRegistry } from "./registry.js";
+import { PoolManager } from "./pool-manager.js";
+import { PostgresRegistryStore } from "./store/registry-store.js";
+import type { RegistryStore } from "./store/registry-store.js";
 
 const DATABASE_URL =
   process.env.POSTGRES_TEST_URL ?? "postgres://rudra:rudra@127.0.0.1:5432/rudra_data";
 const RUN_ID = `app-test-${Date.now().toString(36)}`;
 
 describe("postgres-api phase 2 acceptance", () => {
-  const { app, pools } = createApp();
+  let app: Express;
+  let pools: PoolManager;
+  let store: RegistryStore;
   let sourceId = "";
-  let sourceName = `main_${Date.now().toString(36)}`;
+  const sourceName = `main_${Date.now().toString(36)}`;
 
   beforeAll(async () => {
+    const created = await createApp({ skipEnvStore: true });
+    app = created.app;
+    pools = created.pools;
+    store = created.store;
+
     const res = await request(app).post("/api/v1/postgres/datasources").send({
       name: sourceName,
       connectionString: DATABASE_URL,
@@ -25,12 +37,14 @@ describe("postgres-api phase 2 acceptance", () => {
 
   afterAll(async () => {
     await pools.closeAll();
+    await store.close();
   });
 
   it("exposes health", async () => {
     const res = await request(app).get("/health");
     expect(res.status).toBe(200);
     expect(res.body.service).toBe("postgres-api");
+    expect(res.body.registryStore).toBe("memory");
   });
 
   it("creates resource, fields, index, CRUD, query, upsert, bulk, transaction", async () => {
@@ -123,7 +137,7 @@ describe("postgres-api phase 2 acceptance", () => {
         offset: 0,
       });
     expect(queried.status).toBe(200);
-    expect(queried.data ? queried.body.data.length : queried.body.data.length).toBeGreaterThan(0);
+    expect(queried.body.data.length).toBeGreaterThan(0);
 
     const aggregated = await request(app)
       .post(`/api/v1/postgres/${sourceName}/data/projects/query`)
@@ -178,7 +192,6 @@ describe("postgres-api phase 2 acceptance", () => {
     expect(tx.status).toBe(200);
     expect(tx.body.data).toHaveLength(2);
 
-    // Reject raw SQL-ish resource names by ensuring unknown resource 404s
     const missing = await request(app).get(`/api/v1/postgres/${sourceName}/data/not_a_table`);
     expect(missing.status).toBe(404);
 
@@ -198,5 +211,76 @@ describe("postgres-api phase 2 acceptance", () => {
       `/api/v1/postgres/${sourceName}/resources/projects/fields/status`,
     );
     expect(res.status).toBe(400);
+  });
+});
+
+describe("postgres-api registry persistence", () => {
+  const sourceName = `persist_${Date.now().toString(36)}`;
+  const encryptionKey = "test-metadata-encryption-key!!";
+
+  it("rehydrates datasources and resources after restart", async () => {
+    const firstStore = new PostgresRegistryStore(DATABASE_URL, encryptionKey);
+    const firstRegistry = new PostgresRegistry();
+    const firstPools = new PoolManager(firstRegistry);
+    const first = await createApp({
+      registry: firstRegistry,
+      pools: firstPools,
+      store: firstStore,
+    });
+
+    const ds = await request(first.app).post("/api/v1/postgres/datasources").send({
+      name: sourceName,
+      connectionString: DATABASE_URL,
+      ssl: false,
+      applicationId: `persist-${Date.now().toString(36)}`,
+    });
+    expect(ds.status).toBe(201);
+
+    const resource = await request(first.app)
+      .post(`/api/v1/postgres/${sourceName}/resources`)
+      .send({
+        name: "items",
+        fields: [
+          { name: "id", type: "uuid", primaryKey: true, default: "uuid" },
+          { name: "title", type: "varchar", length: 120, nullable: false },
+        ],
+      });
+    expect(resource.status).toBe(201);
+    const physicalTable = resource.body.data.physicalTable as string;
+
+    await firstPools.closeAll();
+    await firstStore.close();
+
+    const secondStore = new PostgresRegistryStore(DATABASE_URL, encryptionKey);
+    const secondRegistry = new PostgresRegistry();
+    const secondPools = new PoolManager(secondRegistry);
+    const second = await createApp({
+      registry: secondRegistry,
+      pools: secondPools,
+      store: secondStore,
+    });
+
+    const health = await request(second.app).get("/health");
+    expect(health.body.registryStore).toBe("postgres");
+
+    const listed = await request(second.app).get("/api/v1/postgres/datasources");
+    expect(listed.status).toBe(200);
+    expect(listed.body.data.some((item: { name: string }) => item.name === sourceName)).toBe(
+      true,
+    );
+
+    const loaded = await request(second.app).get(
+      `/api/v1/postgres/${sourceName}/resources/items`,
+    );
+    expect(loaded.status).toBe(200);
+    expect(loaded.body.data.physicalTable).toBe(physicalTable);
+
+    const row = await request(second.app)
+      .post(`/api/v1/postgres/${sourceName}/data/items`)
+      .send({ title: "persisted" });
+    expect(row.status).toBe(201);
+
+    await secondPools.closeAll();
+    await secondStore.close();
   });
 });

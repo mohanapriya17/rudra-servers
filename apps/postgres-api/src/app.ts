@@ -9,16 +9,45 @@ import { createDefaultHttpLimiter } from "@rudra/rate-limit";
 import { PostgresRegistry } from "./registry.js";
 import { PoolManager } from "./pool-manager.js";
 import { createPostgresRouter } from "./routes/v1.js";
+import {
+  createRegistryStoreFromEnv,
+  MemoryRegistryStore,
+  type RegistryStore,
+} from "./store/registry-store.js";
 
-export function createApp(options?: {
+export async function createApp(options?: {
   logger?: Logger;
   registry?: PostgresRegistry;
   pools?: PoolManager;
-}): { app: Express; logger: Logger; registry: PostgresRegistry; pools: PoolManager } {
+  store?: RegistryStore;
+  /** Skip env-based store creation (tests). */
+  skipEnvStore?: boolean;
+}): Promise<{
+  app: Express;
+  logger: Logger;
+  registry: PostgresRegistry;
+  pools: PoolManager;
+  store: RegistryStore;
+}> {
   const startedAt = Date.now();
   const logger = options?.logger ?? createLogger({ service: "postgres-api" });
   const registry = options?.registry ?? new PostgresRegistry();
   const pools = options?.pools ?? new PoolManager(registry);
+  const store =
+    options?.store ??
+    (options?.skipEnvStore ? new MemoryRegistryStore() : createRegistryStoreFromEnv());
+
+  if (store.mode === "postgres") {
+    await store.hydrate(registry);
+    logger.info("registry hydrated from POSTGRES_METADATA_URL", {
+      dataSources: registry.listDataSources().length,
+    });
+  } else {
+    logger.warn(
+      "POSTGRES_METADATA_URL not set; datasource/resource registry is in-memory only and will reset on restart",
+    );
+  }
+
   const app = express();
   const limiter = createDefaultHttpLimiter();
 
@@ -50,16 +79,17 @@ export function createApp(options?: {
     res.json({
       status: "ok",
       service: "postgres-api",
-      version: "0.2.0",
+      version: "0.3.0",
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
+      registryStore: store.mode,
     });
   });
 
   app.get("/ready", (_req, res) => {
-    res.json({ status: "ready", service: "postgres-api" });
+    res.json({ status: "ready", service: "postgres-api", registryStore: store.mode });
   });
 
-  app.use("/api/v1/postgres", createPostgresRouter(registry, pools));
+  app.use("/api/v1/postgres", createPostgresRouter(registry, pools, store));
 
   app.use((req, _res, next) => {
     next(new RudraError("NOT_FOUND", `Route not found: ${req.method} ${req.path}`));
@@ -104,7 +134,7 @@ export function createApp(options?: {
     res.status(status).json(toErrorBody(normalized, requestId));
   });
 
-  return { app, logger, registry, pools };
+  return { app, logger, registry, pools, store };
 }
 
 export function mountErrorHandlers(_app: Express): void {

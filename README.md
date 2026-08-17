@@ -78,6 +78,8 @@ Default ports:
 | file-api | 4006 |
 | function-api | 4007 |
 
+On Render, set `POSTGRES_METADATA_URL` (Neon URL) and `POSTGRES_METADATA_ENCRYPTION_KEY` on **postgres-api** so datasource/resource registrations survive restarts.
+
 Copy `.env.example` for local configuration.
 
 Local dependencies (optional):

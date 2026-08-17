@@ -18,6 +18,22 @@ export class PostgresRegistry {
   private dataSourcesByName = new Map<string, string>();
   private resources = new Map<string, PostgresResourceRecord>();
 
+  loadSnapshot(
+    dataSources: PostgresDataSourceRecord[],
+    resources: PostgresResourceRecord[],
+  ): void {
+    this.dataSources.clear();
+    this.dataSourcesByName.clear();
+    this.resources.clear();
+    for (const ds of dataSources) {
+      this.dataSources.set(ds.id, ds);
+      this.dataSourcesByName.set(ds.name, ds.id);
+    }
+    for (const resource of resources) {
+      this.resources.set(resource.id, resource);
+    }
+  }
+
   createDataSource(input: {
     name: string;
     connectionString: string;

@@ -46,7 +46,11 @@ POSTGRES_API_PORT=4001 pnpm --filter @rudra/postgres-api start
 | `PORT` / `POSTGRES_API_PORT` | Listen port (default `4001`) |
 | `HOST` | Bind address |
 | `LOG_LEVEL` | Log verbosity |
+| `POSTGRES_METADATA_URL` | Postgres URL for persisting datasource/resource registry (recommended on Render). Uses schema `rudra_meta`. Can be the same Neon DB as your app data. |
+| `POSTGRES_METADATA_ENCRYPTION_KEY` | AES key material (≥16 chars) used to encrypt stored connection strings. Falls back to `SECRETS_ENCRYPTION_KEY`. |
 | `SECRET_<id>` | Optional secret resolution for `connectionSecretId` |
+
+Without `POSTGRES_METADATA_URL`, the registry stays **in-memory** and is wiped on every restart.
 
 ## Quick example
 
