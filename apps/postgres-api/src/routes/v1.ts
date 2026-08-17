@@ -40,6 +40,8 @@ import {
   upsertRow,
 } from "../data/service.js";
 import { toPublicDataSource } from "../types.js";
+import type { RegistryStore } from "../store/registry-store.js";
+import { MemoryRegistryStore } from "../store/registry-store.js";
 
 function data<T>(value: T, meta?: Record<string, unknown>) {
   return meta ? { data: value, meta } : { data: value };
@@ -62,6 +64,7 @@ function parsePagination(query: Record<string, unknown>) {
 export function createPostgresRouter(
   registry: PostgresRegistry,
   pools: PoolManager,
+  store: RegistryStore = new MemoryRegistryStore(),
 ): Router {
   const router = Router();
 
@@ -93,6 +96,7 @@ export function createPostgresRouter(
       });
       try {
         await pools.getPool(ds.id);
+        await store.saveDataSource(ds);
       } catch (error) {
         registry.removeDataSource(ds.id);
         throw error;
@@ -129,6 +133,7 @@ export function createPostgresRouter(
       try {
         const pool = await pools.getPool(ds.id);
         await createPhysicalTable(pool, resource);
+        await store.saveResource(resource);
       } catch (error) {
         registry.removeResource(resource.id);
         throw error;
@@ -166,6 +171,7 @@ export function createPostgresRouter(
       const pool = await pools.getPool(ds.id);
       await addPhysicalColumn(pool, resource, field);
       const updated = registry.addField(resource.id, field);
+      await store.saveResource(updated);
       res.status(201).json(data(updated));
     } catch (error) {
       next(error);
@@ -212,6 +218,7 @@ export function createPostgresRouter(
         unique: body.unique ?? field.unique,
         defaultValue: body.default !== undefined ? body.default : field.defaultValue,
       });
+      await store.saveResource(updated);
       res.json(data(updated));
     } catch (error) {
       next(error);
@@ -236,6 +243,7 @@ export function createPostgresRouter(
       const pool = await pools.getPool(ds.id);
       await dropPhysicalColumn(pool, resource, field.name);
       const updated = registry.removeField(resource.id, field.name);
+      await store.saveResource(updated);
       res.json(data(updated));
     } catch (error) {
       next(error);
@@ -261,7 +269,9 @@ export function createPostgresRouter(
       };
       const pool = await pools.getPool(ds.id);
       await createPhysicalIndex(pool, resource, index);
-      res.status(201).json(data(registry.addIndex(resource.id, index)));
+      const updated = registry.addIndex(resource.id, index);
+      await store.saveResource(updated);
+      res.status(201).json(data(updated));
     } catch (error) {
       next(error);
     }
@@ -292,7 +302,9 @@ export function createPostgresRouter(
       };
       const pool = await pools.getPool(ds.id);
       await createPhysicalRelation(pool, resource, referenced, relation);
-      res.status(201).json(data(registry.addRelation(resource.id, relation)));
+      const updated = registry.addRelation(resource.id, relation);
+      await store.saveResource(updated);
+      res.status(201).json(data(updated));
     } catch (error) {
       next(error);
     }
