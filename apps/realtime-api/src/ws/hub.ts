@@ -35,7 +35,19 @@ export class RealtimeHub {
   private readonly authSecret: string;
 
   attach(server: Server): WebSocketServer {
-    const wss = new WebSocketServer({ server, path: "/ws", maxPayload: 1_000_000 });
+    const wss = new WebSocketServer({
+      noServer: true,
+      maxPayload: 1_000_000,
+    });
+
+    server.on("upgrade", (req, socket, head) => {
+      const url = new URL(req.url ?? "", "http://localhost");
+      if (url.pathname !== "/ws") return;
+
+      wss.handleUpgrade(req, socket, head, (websocket) => {
+        wss.emit("connection", websocket, req);
+      });
+    });
 
     const heartbeat = setInterval(() => {
       const now = Date.now();
