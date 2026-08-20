@@ -5,9 +5,10 @@ import { createServer } from "node:http";
 import { createApp } from "./app.js";
 
 describe("realtime-api", () => {
-  const { app, hub } = createApp();
+  const { app, hub, yjs } = createApp();
   const server = createServer(app);
   hub.attach(server);
+  yjs.attach(server);
 
   afterAll(async () => {
     await new Promise<void>((resolve) => server.close(() => resolve()));
@@ -61,5 +62,22 @@ describe("realtime-api", () => {
     expect(event.event).toBe("task.updated");
     a.close();
     b.close();
+  });
+
+  it("routes Yjs upgrades without the /ws hub rejecting them", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") {
+      throw new Error("no address");
+    }
+
+    const socket = new WebSocket(`ws://127.0.0.1:${address.port}/yjs/test-room`);
+
+    await new Promise<void>((resolve, reject) => {
+      socket.once("open", resolve);
+      socket.once("error", reject);
+    });
+
+    expect(socket.readyState).toBe(WebSocket.OPEN);
+    socket.close();
   });
 });
