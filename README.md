@@ -16,6 +16,8 @@ This is **not** a domain backend (CRM / ecommerce / project management). Applica
 | Uploads / downloads | **File API** |
 | Custom business logic | **Function API** |
 | PDF generation from templates + row data | **PDF Generator API** |
+| AI chat gateway (server-to-server) | **AI Gateway API** |
+| Session-safe AI forwarding, actions, payments | **Protective Layer** (`@rudra/protective-layer`) |
 | Apps, envs, secrets, metadata, API keys | **Control Plane** |
 
 ## Monorepo layout
@@ -31,9 +33,11 @@ apps/
   file-api/            # S3-compatible files
   function-api/        # Trusted functions / webhooks
   pdf-generator-api/   # Template → PDF zip (Firebase auth)
+  ai-gateway-api/    # AI chat gateway (service JWT)
 
 packages/
   auth/ config/ contracts/ errors/ logging/
+  ai-contracts/ protective-layer/
   metadata/ policies/ rate-limit/
   postgres-driver/ mongodb-driver/ storage-driver/ testing/
 ```
@@ -80,6 +84,7 @@ Default ports:
 | file-api | 4006 |
 | function-api | 4007 |
 | pdf-generator-api | 4008 |
+| ai-gateway-api | 4009 |
 
 On Render, set `POSTGRES_METADATA_URL` (Neon URL) and `POSTGRES_METADATA_ENCRYPTION_KEY` on **postgres-api** so datasource/resource registrations survive restarts.
 
