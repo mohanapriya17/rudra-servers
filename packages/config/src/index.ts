@@ -10,6 +10,7 @@ export const SERVICE_PORTS = {
   "file-api": 4006,
   "function-api": 4007,
   "pdf-generator-api": 4008,
+  "ai-gateway-api": 4009,
 } as const;
 
 export type ServiceName = keyof typeof SERVICE_PORTS;

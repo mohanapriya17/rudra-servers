@@ -18,6 +18,61 @@ importers:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@22.20.1)(tsx@4.23.12)
 
+  apps/ai-gateway-api:
+    dependencies:
+      '@rudra/ai-contracts':
+        specifier: workspace:*
+        version: link:../../packages/ai-contracts
+      '@rudra/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@rudra/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@rudra/errors':
+        specifier: workspace:*
+        version: link:../../packages/errors
+      '@rudra/logging':
+        specifier: workspace:*
+        version: link:../../packages/logging
+      '@rudra/rate-limit':
+        specifier: workspace:*
+        version: link:../../packages/rate-limit
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.6
+      express:
+        specifier: ^4.21.2
+        version: 4.22.2
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@types/cors':
+        specifier: ^2.8.17
+        version: 2.8.19
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.25
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
+      '@types/supertest':
+        specifier: ^6.0.2
+        version: 6.0.3
+      supertest:
+        specifier: ^7.0.0
+        version: 7.2.2
+      tsx:
+        specifier: ^4.19.3
+        version: 4.23.12
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@22.20.1)(tsx@4.23.12)
+
   apps/control-plane-api:
     dependencies:
       '@rudra/auth':
@@ -639,6 +694,19 @@ importers:
         specifier: ^3.0.9
         version: 3.2.7(@types/node@22.20.1)(tsx@4.23.12)
 
+  packages/ai-contracts:
+    dependencies:
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@22.20.1)(tsx@4.23.12)
+
   packages/auth:
     dependencies:
       '@rudra/contracts':
@@ -762,6 +830,37 @@ importers:
       '@types/pg':
         specifier: ^8.11.11
         version: 8.21.0
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.2.7(@types/node@22.20.1)(tsx@4.23.12)
+
+  packages/protective-layer:
+    dependencies:
+      '@rudra/ai-contracts':
+        specifier: workspace:*
+        version: link:../ai-contracts
+      '@rudra/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@rudra/errors':
+        specifier: workspace:*
+        version: link:../errors
+      '@rudra/logging':
+        specifier: workspace:*
+        version: link:../logging
+      '@rudra/rate-limit':
+        specifier: workspace:*
+        version: link:../rate-limit
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
