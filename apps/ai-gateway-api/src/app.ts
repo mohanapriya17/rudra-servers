@@ -65,7 +65,18 @@ export function createGatewayApp(options: GatewayAppOptions = {}): {
     res.json({ status: "live", service: "ai-gateway-api" });
   });
   app.get("/health/ready", (_req, res) => {
-    res.json({ status: "ready", service: "ai-gateway-api" });
+    const checks = {
+      signingSecretConfigured: Boolean(config.RUDRA_AI_GATEWAY_SIGNING_SECRET),
+      audienceConfigured: Boolean(config.RUDRA_AI_GATEWAY_AUDIENCE),
+      openaiConfigured: Boolean(config.OPENAI_API_KEY),
+      geminiConfigured: Boolean(config.GEMINI_API_KEY),
+    };
+    const ready = checks.signingSecretConfigured && checks.audienceConfigured;
+    res.status(ready ? 200 : 503).json({
+      status: ready ? "ready" : "not_ready",
+      service: "ai-gateway-api",
+      checks,
+    });
   });
   app.get("/ready", (_req, res) => {
     res.json({ status: "ready", service: "ai-gateway-api" });

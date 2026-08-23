@@ -80,6 +80,7 @@ describe("protective-layer", () => {
     const payments = createPaymentService({
       allowedRoutes: { success: "/checkout/success", cancel: "/checkout/cancel" },
       webhookSecret: "whsec_test",
+      products: [{ productId: "prod_basic", title: "Basic", amountCents: 999, currency: "USD" }],
     });
     const checkout = payments.createCheckout({
       version: 1,
@@ -92,6 +93,17 @@ describe("protective-layer", () => {
     });
     expect(checkout.redirectUrl).toContain("payments.fake.rudra.example");
     expect(checkout.redirectUrl).not.toMatch(/amount|price/i);
+    expect(() =>
+      payments.createCheckout({
+        version: 1,
+        paymentConfigId: "pay_cfg_1",
+        productId: "unknown",
+        quantity: 1,
+        successRouteId: "success",
+        cancelRouteId: "cancel",
+        idempotencyKey: "checkout-key-2",
+      }),
+    ).toThrow(/Product not found/i);
   });
 
   it("mints gateway service tokens with assistantIds", () => {

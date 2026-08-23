@@ -18,6 +18,7 @@ export interface PaymentProduct {
 export interface PaymentServiceOptions {
   allowedRoutes: Record<string, string>;
   webhookSecret: string;
+  products: PaymentProduct[];
   providerBaseUrl?: string;
 }
 
@@ -45,6 +46,8 @@ export function createPaymentService(options: PaymentServiceOptions): PaymentSer
   return {
     createCheckout(request) {
       const parsed = PaymentCheckoutRequestSchema.parse(request);
+      // Amount/currency are resolved server-side from compiled products — never from the browser.
+      const product = resolveProductAmount(options.products, parsed.productId);
       const successPath = allowlistedRouteRedirect(parsed.successRouteId, options.allowedRoutes);
       const cancelPath = allowlistedRouteRedirect(parsed.cancelRouteId, options.allowedRoutes);
       const checkoutId = randomUUID();
@@ -54,7 +57,7 @@ export function createPaymentService(options: PaymentServiceOptions): PaymentSer
       checkouts.set(checkoutId, {
         checkoutId,
         paymentConfigId: parsed.paymentConfigId,
-        productId: parsed.productId,
+        productId: product.productId,
         quantity: parsed.quantity,
         successPath,
         cancelPath,
