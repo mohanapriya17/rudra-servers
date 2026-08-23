@@ -9,6 +9,7 @@ export const SERVICE_PORTS = {
   "webrtc-api": 4005,
   "file-api": 4006,
   "function-api": 4007,
+  "pdf-generator-api": 4008,
 } as const;
 
 export type ServiceName = keyof typeof SERVICE_PORTS;
