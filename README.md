@@ -15,6 +15,7 @@ This is **not** a domain backend (CRM / ecommerce / project management). Applica
 | Audio / video / screen share | **WebRTC API** |
 | Uploads / downloads | **File API** |
 | Custom business logic | **Function API** |
+| PDF generation from templates + row data | **PDF Generator API** |
 | Apps, envs, secrets, metadata, API keys | **Control Plane** |
 
 ## Monorepo layout
@@ -29,6 +30,7 @@ apps/
   webrtc-api/          # Signaling / rooms / ICE
   file-api/            # S3-compatible files
   function-api/        # Trusted functions / webhooks
+  pdf-generator-api/   # Template → PDF zip (Firebase auth)
 
 packages/
   auth/ config/ contracts/ errors/ logging/
@@ -77,6 +79,7 @@ Default ports:
 | webrtc-api | 4005 |
 | file-api | 4006 |
 | function-api | 4007 |
+| pdf-generator-api | 4008 |
 
 On Render, set `POSTGRES_METADATA_URL` (Neon URL) and `POSTGRES_METADATA_ENCRYPTION_KEY` on **postgres-api** so datasource/resource registrations survive restarts.
 

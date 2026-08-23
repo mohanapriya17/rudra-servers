@@ -8,6 +8,7 @@ const services = [
   ["webrtc-api", 4005],
   ["file-api", 4006],
   ["function-api", 4007],
+  ["pdf-generator-api", 4008],
 ];
 
 const host = process.env.HEALTH_HOST ?? "127.0.0.1";
